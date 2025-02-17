@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.List;
 
 @Slf4j
@@ -27,9 +28,16 @@ public class SongService {
         bean.setAlbum(request.getAlbum());
         bean.setName(request.getName());
         bean.setYear(Integer.parseInt(request.getYear()));
-        //bean.setDuration(request.getDuration());
+        bean.setDuration(parseDuration(request.getDuration()));
         songBeanRepository.save(bean);
         return bean;
+    }
+
+    private long parseDuration(String duration) {
+        String[] parts = duration.split(":");
+        int minutes = Integer.parseInt(parts[0]);
+        int seconds = Integer.parseInt(parts[1]);
+        return Duration.ofMinutes(minutes).plusSeconds(seconds).toSeconds();
     }
 
     public SongBean getById(Long id) throws IllegalArgumentException {
