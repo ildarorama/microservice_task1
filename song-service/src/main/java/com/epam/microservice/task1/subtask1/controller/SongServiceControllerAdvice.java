@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 
@@ -41,16 +43,18 @@ public class SongServiceControllerAdvice {
         return message;
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(exception = {MethodArgumentNotValidException.class, HandlerMethodValidationException.class, MethodArgumentTypeMismatchException.class})
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ErrorMessage unexpectedException(MethodArgumentNotValidException ex) {
+    public ErrorMessage validationException(Exception ex) {
         ErrorMessage message = new ErrorMessage(
                 HttpStatus.BAD_REQUEST.value(),
                 "Validation error");
         message.setDetails(new HashMap<>());
-        ex.getFieldErrors().forEach(error ->
-            message.getDetails().put(error.getField(), error.getDefaultMessage())
-        );
+        if (ex instanceof MethodArgumentNotValidException) {
+            ((MethodArgumentNotValidException)ex).getFieldErrors().forEach(error ->
+                    message.getDetails().put(error.getField(), error.getDefaultMessage())
+            );
+        }
         return message;
     }
 }

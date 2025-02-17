@@ -4,6 +4,8 @@ import com.epam.microservice.task1.subtask1.model.SongBean;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Duration;
+
 @Data
 @NoArgsConstructor
 public class SongBeanEntity {
@@ -11,7 +13,7 @@ public class SongBeanEntity {
     private String name;
     private String artist;
     private String album;
-    private long duration;
+    private String duration;
     private int year;
 
     public SongBeanEntity(SongBean songBean) {
@@ -19,7 +21,10 @@ public class SongBeanEntity {
         this.name = songBean.getName();
         this.artist = songBean.getArtist();
         this.album = songBean.getAlbum();
-        this.duration = songBean.getDuration();
+        var duration = Duration.ofSeconds(songBean.getDuration());
+        int minutes = duration.toMinutesPart();
+        int seconds = duration.toSecondsPart();
+        this.duration = String.format("%02d:%02d", minutes, seconds);
         this.year = songBean.getYear();
     }
 }

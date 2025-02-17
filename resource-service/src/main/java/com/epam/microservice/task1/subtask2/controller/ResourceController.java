@@ -3,6 +3,9 @@ package com.epam.microservice.task1.subtask2.controller;
 import com.epam.microservice.task1.subtask2.cloud.dto.DeleteResourceResponse;
 import com.epam.microservice.task1.subtask2.response.CreateSongResponse;
 import com.epam.microservice.task1.subtask2.service.ResourceService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,17 +29,17 @@ public class ResourceController {
     public ResponseEntity<CreateSongResponse> addSong(@RequestBody byte[] file) {
         long id = resourceService.uploadSong(file);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateSongResponse(id));
+        return ResponseEntity.status(HttpStatus.OK).body(new CreateSongResponse(id));
     }
 
     @GetMapping(value = "/resources/{id}", produces = "audio/mpeg")
-    public ResponseEntity<byte[]> downloadSong(@PathVariable("id") Long id) {
+    public ResponseEntity<byte[]> downloadSong(@Valid @Min(1) @PathVariable("id") Long id) {
         byte[] content = resourceService.downloadSong(id);
         return ResponseEntity.ok(content);
     }
 
     @DeleteMapping("/resources")
-    public ResponseEntity<DeleteResourceResponse> deleteSong(@RequestParam("id") List<Long> ids) {
+    public ResponseEntity<DeleteResourceResponse> deleteSong(@RequestParam("id") @Size(min=1, max=10) List<Long> ids) {
         return ResponseEntity.ok(new DeleteResourceResponse(resourceService.removeSongs(ids)));
     }
 }

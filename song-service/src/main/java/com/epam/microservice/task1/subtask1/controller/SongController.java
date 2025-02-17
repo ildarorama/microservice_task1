@@ -7,9 +7,10 @@ import com.epam.microservice.task1.subtask1.dto.SongDeleteResponse;
 import com.epam.microservice.task1.subtask1.model.SongBean;
 import com.epam.microservice.task1.subtask1.service.SongService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,12 +34,12 @@ public class SongController {
     }
 
     @GetMapping("/songs/{id}")
-    public ResponseEntity<SongBeanEntity> getSongById(@PathVariable Long id) {
+    public ResponseEntity<SongBeanEntity> getSongById(@PathVariable @Valid @Min(1) Long id) {
         return ResponseEntity.ok(new SongBeanEntity(songService.getById(id)));
     }
 
     @DeleteMapping("/songs")
-    public ResponseEntity<SongDeleteResponse> deleteById(@RequestParam("id") List<Long> ids) {
+    public ResponseEntity<SongDeleteResponse> deleteById(@RequestParam("id") @Size(min=1, max=10) List<Long> ids) {
         List<SongBean> deletedBean = songService.deleteById(ids);
 
         return ResponseEntity.ok(new SongDeleteResponse(

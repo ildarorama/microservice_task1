@@ -6,5 +6,5 @@ import java.util.List;
 
 @Data
 public class RemoveSongResponse {
-    private List<Long> id;
+    private List<Long> ids;
 }

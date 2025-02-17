@@ -50,7 +50,7 @@ public class ResourceService {
         resourceBeanRepository.deleteAll(songs);
 
         RemoveSongResponse response = songService.deleteSongs(songs.stream().map(ResourceBean::getId).collect(Collectors.toList()));
-        return response.getId();
+        return response.getIds();
     }
 
     public byte[] downloadSong(Long id) {
