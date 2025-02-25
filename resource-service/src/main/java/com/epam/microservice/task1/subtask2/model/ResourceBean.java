@@ -17,6 +17,7 @@ public class ResourceBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = "file_path")
-    private String filePath;
+    @Column(name = "mp3_file")
+    private byte[] file;
 }
+

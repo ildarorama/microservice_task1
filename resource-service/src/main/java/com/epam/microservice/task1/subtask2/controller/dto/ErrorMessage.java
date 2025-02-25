@@ -1,5 +1,6 @@
 package com.epam.microservice.task1.subtask2.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -7,6 +8,7 @@ import java.util.Map;
 
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorMessage {
     private int errorCode;
     private String errorMessage;

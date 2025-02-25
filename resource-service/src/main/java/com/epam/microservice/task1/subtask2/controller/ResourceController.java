@@ -5,8 +5,9 @@ import com.epam.microservice.task1.subtask2.response.CreateSongResponse;
 import com.epam.microservice.task1.subtask2.service.ResourceService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @RestController
 @AllArgsConstructor
@@ -39,7 +41,9 @@ public class ResourceController {
     }
 
     @DeleteMapping("/resources")
-    public ResponseEntity<DeleteResourceResponse> deleteSong(@RequestParam("id") @Size(min=1, max=10) List<Long> ids) {
-        return ResponseEntity.ok(new DeleteResourceResponse(resourceService.removeSongs(ids)));
+    public ResponseEntity<DeleteResourceResponse> deleteSong(@RequestParam("id") @Length(min=1, max=200) String ids) {
+        var idList = StringUtils.splitByWholeSeparatorPreserveAllTokens(ids, ",");
+        var deletedBeanList = resourceService.removeSongs(Stream.of(idList).map(Long::valueOf).toList());
+        return ResponseEntity.ok(new DeleteResourceResponse(deletedBeanList));
     }
 }

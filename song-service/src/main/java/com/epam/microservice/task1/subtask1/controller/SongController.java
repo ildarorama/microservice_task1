@@ -4,12 +4,17 @@ import com.epam.microservice.task1.subtask1.dto.SongBeanEntity;
 import com.epam.microservice.task1.subtask1.dto.SongCreateRequest;
 import com.epam.microservice.task1.subtask1.dto.SongCreatedResponse;
 import com.epam.microservice.task1.subtask1.dto.SongDeleteResponse;
+import com.epam.microservice.task1.subtask1.exception.SongNotFoundException;
 import com.epam.microservice.task1.subtask1.model.SongBean;
 import com.epam.microservice.task1.subtask1.service.SongService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 public class SongController {
@@ -39,8 +46,16 @@ public class SongController {
     }
 
     @DeleteMapping("/songs")
-    public ResponseEntity<SongDeleteResponse> deleteById(@RequestParam("id") @Size(min=1, max=10) List<Long> ids) {
-        List<SongBean> deletedBean = songService.deleteById(ids);
+    public ResponseEntity<SongDeleteResponse> deleteById(@RequestParam("id") @Length(min = 1, max = 200, message = "Length of string must be > 0 and <= 200")
+                                                         String ids) {
+        List<Long> idList;
+        try {
+            idList = Stream.of(StringUtils.splitByWholeSeparatorPreserveAllTokens(ids, ",")).map(Long::valueOf).toList();
+        } catch (NumberFormatException e) {
+            log.error("Error while parsing ids: {}", ids);
+            throw new SongNotFoundException("Song id list is not parsable");
+        }
+        List<SongBean> deletedBean = songService.deleteById(idList);
 
         return ResponseEntity.ok(new SongDeleteResponse(
                 deletedBean.stream().map(SongBean::getId).collect(Collectors.toList())));

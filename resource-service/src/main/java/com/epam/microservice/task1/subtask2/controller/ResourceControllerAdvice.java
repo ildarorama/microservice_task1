@@ -53,8 +53,8 @@ public class ResourceControllerAdvice {
         ErrorMessage message = new ErrorMessage(
                 HttpStatus.BAD_REQUEST.value(),
                 "Validation error");
-        message.setDetails(new HashMap<>());
         if (ex instanceof MethodArgumentNotValidException) {
+            message.setDetails(new HashMap<>());
             ((MethodArgumentNotValidException) ex).getFieldErrors().forEach(error ->
                     message.getDetails().put(error.getField(), error.getDefaultMessage()));
         }
