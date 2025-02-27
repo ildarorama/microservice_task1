@@ -5,6 +5,7 @@ import com.epam.microservice.task1.subtask1.dto.SongCreateRequest;
 import com.epam.microservice.task1.subtask1.dto.SongCreatedResponse;
 import com.epam.microservice.task1.subtask1.dto.SongDeleteResponse;
 import com.epam.microservice.task1.subtask1.exception.SongNotFoundException;
+import com.epam.microservice.task1.subtask1.exception.SongServiceException;
 import com.epam.microservice.task1.subtask1.model.SongBean;
 import com.epam.microservice.task1.subtask1.service.SongService;
 import jakarta.validation.Valid;
@@ -53,7 +54,7 @@ public class SongController {
             idList = Stream.of(StringUtils.splitByWholeSeparatorPreserveAllTokens(ids, ",")).map(Long::valueOf).toList();
         } catch (NumberFormatException e) {
             log.error("Error while parsing ids: {}", ids);
-            throw new SongNotFoundException("Song id list is not parsable");
+            throw new SongServiceException("Song id list is not parsable");
         }
         List<SongBean> deletedBean = songService.deleteById(idList);
 

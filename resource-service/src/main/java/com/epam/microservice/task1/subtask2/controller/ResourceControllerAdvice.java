@@ -2,6 +2,7 @@ package com.epam.microservice.task1.subtask2.controller;
 
 import com.epam.microservice.task1.subtask2.cloud.SongServiceException;
 import com.epam.microservice.task1.subtask2.controller.dto.ErrorMessage;
+import com.epam.microservice.task1.subtask2.exception.ResourceServiceException;
 import com.epam.microservice.task1.subtask2.exception.SongNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +13,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice(assignableTypes = ResourceController.class)
 public class ResourceControllerAdvice {
@@ -47,7 +49,7 @@ public class ResourceControllerAdvice {
     }
 
 
-    @ExceptionHandler(exception = {MethodArgumentNotValidException.class, HandlerMethodValidationException.class, MethodArgumentTypeMismatchException.class})
+    @ExceptionHandler(exception = {MethodArgumentNotValidException.class, HandlerMethodValidationException.class, MethodArgumentTypeMismatchException.class, ResourceServiceException.class})
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorMessage argumentValidateException(Exception ex) {
         ErrorMessage message = new ErrorMessage(
@@ -57,6 +59,10 @@ public class ResourceControllerAdvice {
             message.setDetails(new HashMap<>());
             ((MethodArgumentNotValidException) ex).getFieldErrors().forEach(error ->
                     message.getDetails().put(error.getField(), error.getDefaultMessage()));
+        } else if (ex instanceof ResourceServiceException) {
+            Map<String, String> errors = new HashMap<>();
+            message.setDetails(errors);
+            errors.put("id", ex.getMessage());
         }
         return message;
     }

@@ -3,6 +3,7 @@ package com.epam.microservice.task1.subtask1.controller;
 import com.epam.microservice.task1.subtask1.controller.dto.ErrorMessage;
 import com.epam.microservice.task1.subtask1.exception.SongAlreadyExists;
 import com.epam.microservice.task1.subtask1.exception.SongNotFoundException;
+import com.epam.microservice.task1.subtask1.exception.SongServiceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -45,7 +46,7 @@ public class SongServiceControllerAdvice {
         return message;
     }
 
-    @ExceptionHandler(exception = {MethodArgumentNotValidException.class, HandlerMethodValidationException.class, MethodArgumentTypeMismatchException.class})
+    @ExceptionHandler(exception = {MethodArgumentNotValidException.class, HandlerMethodValidationException.class, MethodArgumentTypeMismatchException.class, SongServiceException.class})
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorMessage validationException(Exception ex) {
 
@@ -64,6 +65,9 @@ public class SongServiceControllerAdvice {
             ((MethodArgumentNotValidException)ex).getFieldErrors().forEach(error ->
                     message.getDetails().put(error.getField(), error.getDefaultMessage())
             );
+        } else if (ex instanceof SongServiceException) {
+            message.setDetails(new HashMap<>());
+            message.getDetails().put("id", ex.getMessage());
         }
         return message;
     }

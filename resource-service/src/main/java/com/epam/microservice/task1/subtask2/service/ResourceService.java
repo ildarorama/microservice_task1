@@ -43,7 +43,7 @@ public class ResourceService {
 
     public byte[] downloadSong(Long id) {
         return resourceBeanRepository.findById(id).map(ResourceBean::getFile).orElseThrow(() ->
-                new SongNotFoundException("Song with such id is not find")
+                new SongNotFoundException("Resource with ID=" + id + " not found")
         );
     }
 

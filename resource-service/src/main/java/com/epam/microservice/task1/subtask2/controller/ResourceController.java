@@ -1,6 +1,8 @@
 package com.epam.microservice.task1.subtask2.controller;
 
 import com.epam.microservice.task1.subtask2.cloud.dto.DeleteResourceResponse;
+import com.epam.microservice.task1.subtask2.exception.ResourceServiceException;
+import com.epam.microservice.task1.subtask2.exception.SongNotFoundException;
 import com.epam.microservice.task1.subtask2.response.CreateSongResponse;
 import com.epam.microservice.task1.subtask2.service.ResourceService;
 import jakarta.validation.Valid;
@@ -10,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,8 +45,13 @@ public class ResourceController {
 
     @DeleteMapping("/resources")
     public ResponseEntity<DeleteResourceResponse> deleteSong(@RequestParam("id") @Length(min=1, max=200) String ids) {
-        var idList = StringUtils.splitByWholeSeparatorPreserveAllTokens(ids, ",");
-        var deletedBeanList = resourceService.removeSongs(Stream.of(idList).map(Long::valueOf).toList());
+        List<Long> idList;
+        try {
+            idList = Stream.of(StringUtils.splitByWholeSeparatorPreserveAllTokens(ids, ",")).map(Long::valueOf).toList();
+        } catch (NumberFormatException e) {
+            throw new ResourceServiceException("Song id list is not parsable");
+        }
+        var deletedBeanList = resourceService.removeSongs(idList);
         return ResponseEntity.ok(new DeleteResourceResponse(deletedBeanList));
     }
 }
